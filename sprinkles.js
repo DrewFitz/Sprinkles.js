@@ -4,14 +4,11 @@
 // Written by Drew Fitzpatrick
 //
 //
-//TODO:
+// TODO:
 // - Cache particles
 // - Animate particles over time
 // - Configurable particles
-// - 
-
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
+// -- 
 
 function Particle() { 
   this.x; 
@@ -20,6 +17,9 @@ function Particle() {
   this.height = 20;
   this.vX = (Math.random() * 10) - 5;
   this.vY = (Math.random() * 10) - 5;
+  this.fill = "";
+
+  // Methods
   this.isVisible = function() {
     if (this.x > canvas.clientWidth) 
       return false;
@@ -32,8 +32,7 @@ function Particle() {
 
     return true;
   };
-  this.fill = "";
-  this.draw = function() {
+  this.draw = function(ctx) {
     if (this.fill !== "") {
       ctx.fillStyle = this.fill;
     }
@@ -41,13 +40,32 @@ function Particle() {
   }
 }
 
-function ParticleManager() {
+function ParticleManager(ctx) {
   if (!(this instanceof ParticleManager)) {
-    return new ParticleManager();
+    return new ParticleManager(ctx);
   }
+
+  // private
+  var graphicsContext = ctx;
   var particles = [];
   var globalXAcc = 0;
   var globalYAcc = -2;
+  function drawCross(x,y) {
+    graphicsContext.fillStyle = "";
+    graphicsContext.strokeStyle = "rgb(0,0,200)";
+    graphicsContext.beginPath();
+    graphicsContext.moveTo(x - 5, y);
+    graphicsContext.lineTo(x + 5, y);
+    graphicsContext.moveTo(x, y - 5);
+    graphicsContext.lineTo(x, y + 5);
+    graphicsContext.closePath();
+    graphicsContext.stroke();
+  };
+
+  // public accessors and methods
+  this.active = true;
+  this.drawOrigin = false;
+  this.particleFill = "";
 
   this.setGlobalAcceleration = function(x,y){
     globalXAcc = x;
@@ -57,10 +75,6 @@ function ParticleManager() {
     x: canvas.clientWidth / 2,
     y: canvas.clientHeight / 2
   };
-  this.active = true;
-  this.drawOrigin = false;
-  this.particleFill = "";
-
   this.count = function() {
     return particles.length;
   };
@@ -82,21 +96,10 @@ function ParticleManager() {
       }
     });
   };
-  function drawCross(x,y) {
-    ctx.fillStyle = "";
-    ctx.strokeStyle = "rgb(0,0,200)";
-    ctx.beginPath();
-    ctx.moveTo(x - 5, y);
-    ctx.lineTo(x + 5, y);
-    ctx.moveTo(x, y - 5);
-    ctx.lineTo(x, y + 5);
-    ctx.closePath();
-    ctx.stroke();
-  };
   this.render = function() {
-    ctx.fillStyle = "rgb(200,0,0)";
+    graphicsContext.fillStyle = "rgb(200,0,0)";
     particles.forEach(function(particle) {
-      particle.draw();
+      particle.draw(graphicsContext);
     });
     if(this.drawOrigin)
       drawCross(this.origin.x, this.origin.y);

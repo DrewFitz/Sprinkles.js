@@ -1,5 +1,15 @@
+// program.js
+// a simple driver for experimenting and testing Sprinkles
+//
+// Written by Drew Fitzpatrick
+//
 
-function clear() {
+var canvas = document.getElementById("canvas");
+var canvas2 = document.getElementById("canvas2");
+var ctx = canvas.getContext("2d");
+var ctx2 = canvas2.getContext("2d");
+
+function clear(ctx) {
   ctx.fillStyle = "rgba(0,0,0,0.2)";
   ctx.fillRect(0,0, canvas.clientWidth, canvas.clientHeight);
 }
@@ -10,20 +20,21 @@ function clear() {
 // 
 //
 
-var pm = new ParticleManager();
-var pm2 = new ParticleManager();
+var pm = new ParticleManager(ctx);
+var pm2 = new ParticleManager(ctx2);
 
 pm2.origin.x = 50;
-pm2.origin.y += 50;
+pm2.origin.y = 50;
 pm2.setGlobalAcceleration(2, 1);
 pm2.drawOrigin = true;
 pm2.particleFill = "rgb(255,255,255)";
 
 function tick() {
-  clear();
+  clear(ctx);
   pm.update();
   pm.render();
 
+  clear(ctx2);
   pm2.update();
   pm2.render();
 }
