@@ -37,7 +37,7 @@ function Particle() {
       ctx.fillStyle = this.fill;
     }
     ctx.fillRect(this.x, this.y, this.width, this.height);
-  }
+  };
 }
 
 function ParticleManager(ctx) {
@@ -70,7 +70,7 @@ function ParticleManager(ctx) {
   this.setGlobalAcceleration = function(x,y){
     globalXAcc = x;
     globalYAcc = y;
-  }
+  };
   this.origin = {
     x: canvas.clientWidth / 2,
     y: canvas.clientHeight / 2
