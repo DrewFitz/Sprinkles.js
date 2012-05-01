@@ -14,23 +14,40 @@ var pm = new ParticleManager(ctx);
 var pm2 = new ParticleManager(ctx2);
 pm2.origin.x = 50;
 pm2.origin.y = 50;
-pm2.setGlobalAcceleration(2, 1);
+pm2.setGlobalAcceleration(.5, 0);
 pm2.drawOrigin = true;
 pm2.particleFill = "rgb(255,255,255)";
 
 
-function clearContext(ctx) {
-  ctx.fillStyle = "rgba(0,0,0,0.2)";
-  ctx.fillRect(0,0, canvas.clientWidth, canvas.clientHeight);
+function clearContextWithFill(ctx, fill) {
+  ctx.fillStyle = fill;
+  ctx.fillRect(0,0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
 }
 
+function clearContext(ctx) {
+  clearContextWithFill(ctx, "rgba(0,0,0,0.2)");
+}
+
+var pm2y = 0;
+var t = 0;
+var toRad = function toRad(num) {
+  return (num * (Math.PI / 180));
+};
 // Main loop
 function tick() {
   clearContext(ctx);
   pm.update();
   pm.render();
 
-  clearContext(ctx2);
+  // Make the second origin move
+  t = t+4;
+  t = t%360;
+  pm2y = Math.sin(toRad(t));
+  pm2y *= 70;
+  pm2y += 120;
+  pm2.origin.y = pm2y;
+
+  clearContextWithFill(ctx2, "rgba(0,0,0,1)");
   pm2.update();
   pm2.render();
 }
@@ -38,7 +55,7 @@ function tick() {
 var interval, logInterval, toggleInterval;
 function startAllTheThings() {
   // Set up run loop
-  interval = setInterval(tick, 20);
+  interval = setInterval(tick, 34); // ~= 30fps
   // Debug loop
   logInterval = setInterval(function() {
     console.log("Particles: " + pm.count());
