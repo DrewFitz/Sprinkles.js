@@ -56,12 +56,13 @@ function Particle() {
 }
 
 function ParticleManager(ctx) {
+  // Guard against missing new statements
   if (!(this instanceof ParticleManager)) {
     return new ParticleManager(ctx);
   }
 
   // private
-  var particleCache = [];
+  var cachedParticles = [];
   var graphicsContext = ctx;
   var activeParticles = [];
   var globalXAcc = 0;
@@ -81,7 +82,7 @@ function ParticleManager(ctx) {
     return activeParticles.length;
   };
   this.cacheCount = function() {
-    return particleCache.length;
+    return cachedParticles.length;
   };
 
   // public accessors and methods
@@ -102,8 +103,8 @@ function ParticleManager(ctx) {
   this.update = function() {
     if (this.active) {
       var newParticle; 
-      if (particleCache.length > 0) {
-        newParticle = particleCache.pop();
+      if (cachedParticles.length > 0) {
+        newParticle = cachedParticles.pop();
       } else {
         newParticle = new Particle();
       }
@@ -123,7 +124,7 @@ function ParticleManager(ctx) {
       particle.x += particle.vX;
       particle.y += particle.vY;
       if(!(particle.isVisible(graphicsContext))){
-        particleCache.push(particle);
+        cachedParticles.push(particle);
         particles.splice(index, 1);
       }
     }, this);
