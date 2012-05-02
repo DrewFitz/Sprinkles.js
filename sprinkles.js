@@ -5,20 +5,32 @@
 //
 //
 // TODO:
-// - Cache particles
 // - Animate particles over time
 // - Configurable particles
 // -- 
 
 function Particle() { 
-  this.init = function() {
+  // Guard against forgotten new
+  if (!(this instanceof Particle)) {
+    return new Particle();
+  }
+
+  this.copyFromParticle = function(particle) {
+    this.width = particle.width;
+    this.height = particle.height;
+    this.fill = particle.fill;
+  }
+
+  this.reset = function() {
     this.x = 0; 
     this.y = 0;
     this.width = 20;
     this.height = 20;
     this.vX = (Math.random() * 10) - 5;
     this.vY = (Math.random() * 10) - 5;
-    this.fill = "";
+    this.fill = "rgb(255,255,255)";
+
+    return this;
   };
 
   // Methods
@@ -34,15 +46,12 @@ function Particle() {
 
     return true;
   };
-
   this.draw = function(ctx) {
-    if (this.fill !== "") {
-      ctx.fillStyle = this.fill;
-    }
+    ctx.fillStyle = this.fill;
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
 
-  this.init();
+  this.reset();
   return this;
 }
 
@@ -68,27 +77,28 @@ function ParticleManager(ctx) {
     graphicsContext.closePath();
     graphicsContext.stroke();
   };
+  this.count = function() {
+    return activeParticles.length;
+  };
+  this.cacheCount = function() {
+    return particleCache.length;
+  };
 
   // public accessors and methods
+  this.masterParticle;
   this.active = true;
   this.drawOrigin = false;
   this.particleFill = "";
   this.useRelativeCooridateSpace = false;
-
-  this.setGlobalAcceleration = function(x,y){
-    globalXAcc = x;
-    globalYAcc = y;
-  };
-
   this.origin = {
     x: graphicsContext.canvas.clientWidth / 2,
     y: graphicsContext.canvas.clientHeight / 2
   };
 
-  this.count = function() {
-    return activeParticles.length;
+  this.setGlobalAcceleration = function(x,y){
+    globalXAcc = x;
+    globalYAcc = y;
   };
-  
   this.update = function() {
     if (this.active) {
       var newParticle; 
@@ -97,10 +107,14 @@ function ParticleManager(ctx) {
       } else {
         newParticle = new Particle();
       }
-      newParticle.init();
+      newParticle.reset();
+      if (this.masterParticle) {
+        newParticle.copyFromParticle(this.masterParticle);
+      } else if (this.particleFill) {
+        newParticle.fill = this.particleFill;
+      }
       newParticle.x = this.origin.x;
       newParticle.y = this.origin.y;
-      newParticle.fill = this.particleFill;
       activeParticles.push(newParticle);
     }
     activeParticles.forEach(function(particle, index, particles) {
@@ -115,7 +129,6 @@ function ParticleManager(ctx) {
     }, this);
   };
   this.render = function() {
-    graphicsContext.fillStyle = "rgb(200,0,0)";
     activeParticles.forEach(function(particle) {
       particle.draw(graphicsContext);
     });

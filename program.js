@@ -10,13 +10,13 @@ var ctx = canvas.getContext("2d");
 var ctx2 = canvas2.getContext("2d");
 
 // Setup
-var pm = new ParticleManager(ctx);
-var pm2 = new ParticleManager(ctx2);
+var pm = ParticleManager(ctx);
+var pm2 = ParticleManager(ctx2);
 pm2.origin.x = 50;
 pm2.origin.y = 50;
 pm2.setGlobalAcceleration(.5, 0);
 pm2.drawOrigin = true;
-pm2.particleFill = "rgb(255,255,255)";
+pm2.particleFill = "rgb(255,0,0)";
 
 
 function clearContextWithFill(ctx, fill) {
@@ -53,17 +53,23 @@ function tick() {
 }
 
 var interval, logInterval, toggleInterval;
+var masterParticle = new Particle();
+masterParticle.width = 5;
+masterParticle.height = 5;
+masterParticle.fill = "rgb(0,255,0)";
 function startAllTheThings() {
   // Set up run loop
   interval = setInterval(tick, 34); // ~= 30fps
   // Debug loop
   logInterval = setInterval(function() {
-    console.log("Particles: " + pm.count());
+    console.log("PM1: " + pm.count() + " Cache: " + pm.cacheCount());
+    console.log("PM2: " + pm2.count() + " Cache: " + pm2.cacheCount());
   }, 1000);
   // Start/stop spray loop
   toggleInterval = setInterval(function() {
     if(pm.active) {
       pm.active = false;
+      pm2.masterParticle = masterParticle;
       pm2.active = true;
     } else {
       pm.active = true;
